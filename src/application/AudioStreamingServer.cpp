@@ -61,7 +61,6 @@ void AudioStreamingServer::Serve(const std::shared_ptr<ISocket>& clientSocket)
         HttpRequest request(recvBuffer, read);
 
         std::string requestUrl = httpExtractor->ExtractGET(request);
-        std::cout << request.GetMessage() << '\n';
         requestUrl = urlCodec->DecodeURL(requestUrl);
 
         const char* songsearch = "/songsearch/";
