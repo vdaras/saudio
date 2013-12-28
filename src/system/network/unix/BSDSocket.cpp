@@ -31,59 +31,46 @@
 #include "system/network/NetworkException.h"
 
 BSDSocket::BSDSocket(bool open)
-    : opened(false),
-      descriptor(-1)
-{
-
-    if(open)
-    {
+: opened(false),
+  descriptor(-1) {
+    if(open) {
         Open();
     }
-
 }
 
 
 BSDSocket::BSDSocket(int descriptor)
-    : opened(true),
-      descriptor(descriptor)
-{
+: opened(true),
+  descriptor(descriptor) {
 }
 
 
-BSDSocket::~BSDSocket()
-{
+BSDSocket::~BSDSocket() {
     Close();
 }
 
 
 BSDSocket::BSDSocket(BSDSocket&& rvalue)
-    : opened(rvalue.opened),
-      descriptor(rvalue.descriptor)
-{
+: opened(rvalue.opened),
+descriptor(rvalue.descriptor) {
     rvalue.opened = false;
     rvalue.descriptor = -1;
 }
 
 
-BSDSocket& BSDSocket::operator=(BSDSocket&& rvalue)
-{
+BSDSocket& BSDSocket::operator=(BSDSocket&& rvalue) {
     opened = rvalue.opened;
     descriptor = rvalue.descriptor;
-
     rvalue.opened = false;
     rvalue.descriptor = -1;
-
     return *this;
 }
 
 
-void BSDSocket::Open()
-{
-    if(!opened)
-    {
+void BSDSocket::Open() {
+    if(!opened) {
         descriptor = socket(AF_INET, SOCK_STREAM, 0);
-        if(descriptor == -1)
-        {
+        if(descriptor == -1) {
             throw NetworkException(strerror(errno));
         }
         opened = true;
@@ -91,57 +78,41 @@ void BSDSocket::Open()
 }
 
 
-void BSDSocket::Close()
-{
-    if(opened)
-    {
+void BSDSocket::Close() {
+    if(opened) {
         close(descriptor);
         opened = false;
     }
 }
 
 
-const int BSDSocket::GetDescriptor() const
-{
+const int BSDSocket::GetDescriptor() const {
     return descriptor;
 }
 
-void BSDSocket::Send(const char buffer[], unsigned n) const
-{
 
+void BSDSocket::Send(const char buffer[], unsigned n) const {
     int toSend = static_cast<int>(n);
-
-    while(toSend > 0)
-    {
-
+    while(toSend > 0) {
         int totalSent = send(descriptor, buffer, toSend, 0);
-
         toSend -= totalSent;
-
     }
 }
 
 
-unsigned BSDSocket::Receive(char buffer[], unsigned n) const
-{
-
+unsigned BSDSocket::Receive(char buffer[], unsigned n) const {
     int read = recv(descriptor, buffer, n, 0);
-
-    if(read == -1)
-    {
+    if(read == -1) {
         throw NetworkException(strerror(errno));
     }
-
     return static_cast<unsigned>(read);
 }
 
 
-void BSDSocket::SetReceiveTimeout(unsigned seconds)
-{
+void BSDSocket::SetReceiveTimeout(unsigned seconds) {
     timeval t;
     t.tv_sec = seconds;
     t.tv_usec = 0;
-
     setsockopt(descriptor, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char*>(&t),sizeof(struct timeval));
 }
 

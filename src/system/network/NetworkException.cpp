@@ -20,12 +20,9 @@
 #include "NetworkException.h"
 
 NetworkException::NetworkException(const std::string& message)
-    : SystemException(message)
-{
-
+: SystemException(message) {
 }
 
-NetworkException::~NetworkException() noexcept
-{
+NetworkException::~NetworkException() noexcept {
 
 }

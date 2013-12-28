@@ -20,23 +20,20 @@
 #include "Http.h"
 
 
-std::map<HttpVersion, const char*> HTTP_VERSION_TO_MESSAGE =
-{
+std::map<HttpVersion, const char*> HTTP_VERSION_TO_MESSAGE = {
     { HTTP_1_0, "HTTP/1.0" },
     { HTTP_1_1, "HTTP/1.1" }
 };
 
 
-std::map<HttpResponseCode, const char*> HTTP_CODE_TO_MESSAGE =
-{
+std::map<HttpResponseCode, const char*> HTTP_CODE_TO_MESSAGE = {
     { OK, "OK" },
     { BAD_REQUEST, "Bad Request" },
     { NOT_FOUND, "Not Found" },
 };
 
 
-std::map<HttpContentType, const char*> HTTP_CONTENT_TYPE_TO_MESSAGE =
-{
+std::map<HttpContentType, const char*> HTTP_CONTENT_TYPE_TO_MESSAGE = {
     { MP3,  "audio/mpeg" },
     { MP4,  "audio/mpeg" },
     { M3U,  "audio/mpegurl" },

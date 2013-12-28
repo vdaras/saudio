@@ -20,14 +20,11 @@
 #include "SimpleScopeGuard.h"
 
 SimpleScopeGuard::SimpleScopeGuard(const Callback& rollbackFunction)
-    : rollbackFunction(rollbackFunction)
-{
+: rollbackFunction(rollbackFunction) {
 }
 
-SimpleScopeGuard::~SimpleScopeGuard()
-{
-    if(!IsDismissed())
-    {
+SimpleScopeGuard::~SimpleScopeGuard() {
+    if(!IsDismissed()) {
         rollbackFunction();
     }
 }

@@ -24,18 +24,15 @@
 #include <memory>
 #include <iostream>
 
-HttpRequest::HttpRequest(char data[], unsigned dataSize)
-{
-
+HttpRequest::HttpRequest(char data[], unsigned dataSize) {
     request = std::string(data, dataSize);
 }
 
-HttpRequest::~HttpRequest()
-{
 
+HttpRequest::~HttpRequest() {
 }
 
-const std::string& HttpRequest::GetMessage() const
-{
+
+const std::string& HttpRequest::GetMessage() const {
     return request;
 }

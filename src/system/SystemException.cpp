@@ -21,12 +21,10 @@
 
 
 SystemException::SystemException(const std::string& message)
-    : BaseException(message)
-{
+: BaseException(message) {
 }
 
-SystemException::~SystemException() noexcept
-{
+SystemException::~SystemException() noexcept {
 
 }
 
@@ -35,10 +33,8 @@ SystemException::~SystemException() noexcept
 
 
 UnsupportedOSException::UnsupportedOSException()
-    : SystemException("Unsupported OS.")
-{
+: SystemException("Unsupported OS.") {
 }
 
-UnsupportedOSException::~UnsupportedOSException() noexcept
-{
+UnsupportedOSException::~UnsupportedOSException() noexcept {
 }
