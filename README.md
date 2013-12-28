@@ -28,6 +28,24 @@ if you need to build with debugging symbols enabled
       scons --debug-build
 
 
+When starting the server, it needs to receive the port number that it will listen
+for incoming connections (using the -p command line argument) and where are the
+audio files that the server can stream (-l). It can optionally receive the 
+maximum simultaneous connections (-c) and how many serving threads to spawn (-t).
+
+In order for a client to request an audio file stream, a URL like this should
+be used
+
+    http://hostname:port/filename
+
+It is possible for a client to search the server's available audio files by
+using a URL like this
+
+   http://hostname:port/songsearch/keyword
+
+The server's response will be an .m3u file containing all URLs for files matching
+the keyword.
+
 
 
 
