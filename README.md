@@ -29,8 +29,8 @@ if you need to build with debugging symbols enabled
 
 
 When starting the server, it needs to receive the port number that it will listen
-for incoming connections (using the -p command line argument) and where are the
-audio files that the server can stream (-l). It can optionally receive the 
+for incoming connections (using the -p command line argument) and the directory
+containing the audio files that the server can stream (-l). It can optionally receive the 
 maximum simultaneous connections (-c) and how many serving threads to spawn (-t).
 
 In order for a client to request an audio file stream, a URL like this should
