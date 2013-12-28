@@ -57,7 +57,7 @@ std::unique_ptr<Server> CreateServer(int argc, char* argv[]) {
     char option;
     std::map<char, std::string> argValues;
     //put all argument values in a map
-    while((option = pgetopt(argc, argv, "p:l:c:")) != -1) {
+    while((option = pgetopt(argc, argv, "p:l:c:t:")) != -1) {
         if(poptarg != nullptr) {
             argValues[option] = poptarg;
         }
