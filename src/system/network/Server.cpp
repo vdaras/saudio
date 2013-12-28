@@ -22,9 +22,6 @@
 //standard library includes
 #include <iostream>
 
-//system includes
-#include <unistd.h>
-
 #include "ServerSocketFactory.h"
 #include "system/SystemException.h"
 #include "util/scopeguard/SimpleScopeGuard.h"
