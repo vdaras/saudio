@@ -7,7 +7,7 @@ with the language's new features.
 
 saudio compiles successfully in all platforms but running it is only supported
 in Unix-like OSes. The code that handles platform specific code can be extended
-to support other OSes. 
+to support other platforms. 
 
 saudio is minimalistic, it only uses the STL and no external libraries. 
 
