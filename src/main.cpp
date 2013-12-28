@@ -62,26 +62,29 @@ std::unique_ptr<Server> CreateServer(int argc, char* argv[]) {
             argValues[option] = poptarg;
         }
     }
-    unsigned short portNo;
-    std::string libraryDirectory;
-    //get supplied values for port number and music library's root dir
-    //if either is not supplied then throw an exceptions since they
-    //are mandatory
-    if(argValues.find('p') != argValues.end() &&
-            argValues.find('l') != argValues.end()) {
-        try {
-            portNo = std::stoi(argValues['p']);
-        } catch(const std::invalid_argument& e) {
-            throw InvalidArgumentException("p", argValues['p']);
-        }
-        libraryDirectory = std::string(argValues['l']);
-        if(libraryDirectory[libraryDirectory.length() - 1] != '/') {
-            libraryDirectory += '/';
-        }
-    } else {
-        throw InsufficientArgumentsException();
-    }
+
     try {
+
+        //get supplied values for port number and music library's root dir
+        //if either is not supplied then throw an exception since they
+        //are mandatory
+        unsigned short portNo;
+
+        std::string libraryDirectory;
+      
+        if(argValues.find('p') != argValues.end() &&
+            argValues.find('l') != argValues.end()) {
+
+            portNo = std::stoi(argValues['p']);
+
+            libraryDirectory = std::string(argValues['l']);
+            if(libraryDirectory[libraryDirectory.length() - 1] != '/') {
+                libraryDirectory += '/';
+            }
+        } else {
+            throw InsufficientArgumentsException();
+        }
+
         //get max connections if supplied, else use default value
         unsigned maxConnections = argValues.find('c') != argValues.end() ?
                                   std::stoi(argValues['c']) :
@@ -92,6 +95,8 @@ std::unique_ptr<Server> CreateServer(int argc, char* argv[]) {
         return std::unique_ptr<Server>(new AudioStreamingServer(portNo, maxConnections, servingThreads, libraryDirectory));
     } catch(const std::invalid_argument& e) {
         throw InvalidArgumentException("c", argValues['c']);
+    } catch(const std::system_error& e) {
+        throw SystemException(e.what());
     }
 }
 
