@@ -1,0 +1,5 @@
+*.log
+*.o
+.sconf_temp/
+.sconsign.dblite
+saudio

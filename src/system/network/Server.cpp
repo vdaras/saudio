@@ -72,11 +72,7 @@ void Server::Run() {
                 std::lock_guard<std::mutex> guard(stderrMutex);
                 std::cerr << e.what() << '\n';
  
-            } catch(const std::system_error& e) {
-
-                std::lock_guard<std::mutex> guard(stderrMutex);
-                std::cerr << "Could not start thread: " << e.what() << '\n';
-            }
+            } 
         }
     }
 }
