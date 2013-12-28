@@ -19,58 +19,71 @@
 
 #include "ThreadPool.h"
 
-ThreadPool::ThreadPool(unsigned short totalThreads) 
-: running(true) {
+ThreadPool::ThreadPool(unsigned short totalThreads)
+    : running(true)
+{
 
     workingThreads.reserve(totalThreads);
-    for(unsigned short i = 0; i < totalThreads; i++) {
+    for(unsigned short i = 0; i < totalThreads; i++)
+    {
         workingThreads.push_back(std::thread(&ThreadPool::Worker, this));
     }
 
 }
 
 
-ThreadPool::~ThreadPool() {
+ThreadPool::~ThreadPool()
+{
 
     running = false;
 
-	for(std::thread& thread : workingThreads) {
-		if(thread.joinable()) {
- 		    thread.join();
- 	    }
-	}
+for(std::thread& thread : workingThreads)
+    {
+        if(thread.joinable())
+        {
+            thread.join();
+        }
+    }
 }
 
 
-void ThreadPool::EnqueueTask(const std::function<void()>& task) {
+void ThreadPool::EnqueueTask(const std::function<void()>& task)
+{
     std::lock_guard<std::mutex> queueLock(queueMutex);
     tasks.push(std::move(task));
 }
 
 
-void ThreadPool::Worker() {
+void ThreadPool::Worker()
+{
 
-    while(running) {
+    while(running)
+    {
 
         std::function<void()> task;
-        if(DequeueTask(&task)) {
-        	task();
-        } else {
-        	std::this_thread::yield();
+        if(DequeueTask(&task))
+        {
+            task();
+        }
+        else
+        {
+            std::this_thread::yield();
         }
 
     }
 }
 
 
-bool ThreadPool::DequeueTask(std::function<void()>* taskOut) {
-	std::lock_guard<std::mutex> queueLock(queueMutex);
-	if(!tasks.empty()) {
+bool ThreadPool::DequeueTask(std::function<void()>* taskOut)
+{
+    std::lock_guard<std::mutex> queueLock(queueMutex);
+    if(!tasks.empty())
+    {
         *taskOut = tasks.front();
         tasks.pop();
         return true;
-	}
+    }
 
-	return false;
+    return false;
 }
 

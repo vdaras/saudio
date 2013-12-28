@@ -22,33 +22,40 @@
 //standard library includes
 #include <algorithm>
 
-Directory::Directory(const std::string& name, Directory* parent) 
-: name(name),
-  parentDirectory(parent) {
+Directory::Directory(const std::string& name, Directory* parent)
+    : name(name),
+      parentDirectory(parent)
+{
 
 }
 
-Directory::~Directory() {
-	std::for_each(subDirectories.begin(), subDirectories.end(), [](Directory* dir){
-		delete dir;
-	});
-	subDirectories.clear();
+Directory::~Directory()
+{
+    std::for_each(subDirectories.begin(), subDirectories.end(), [](Directory* dir)
+    {
+        delete dir;
+    });
+    subDirectories.clear();
 }
 
 
-const std::string& Directory::GetName() const {
+const std::string& Directory::GetName() const
+{
     return name;
 }
 
-const std::forward_list<std::string>& Directory::GetFiles() const {
+const std::forward_list<std::string>& Directory::GetFiles() const
+{
     return files;
 };
 
 
-const std::forward_list<Directory*>& Directory::GetSubDirectories() const {
-	return subDirectories;
+const std::forward_list<Directory*>& Directory::GetSubDirectories() const
+{
+    return subDirectories;
 }
 
-Directory* Directory::GetParent() const {
+Directory* Directory::GetParent() const
+{
     return parentDirectory;
 }

@@ -26,17 +26,21 @@
 
 static std::map<int, std::list<SignalHandler>> handlerLists;
 
-void AddSignalHandler(int signal,const SignalHandler& handler) {
-	handlerLists[signal].push_back(handler);
+void AddSignalHandler(int signal,const SignalHandler& handler)
+{
+    handlerLists[signal].push_back(handler);
 }
 
-void InvokeSignalHandlers(int signal) {
+void InvokeSignalHandlers(int signal)
+{
 
-	if(handlerLists.find(signal) != handlerLists.end()) {
+    if(handlerLists.find(signal) != handlerLists.end())
+    {
         std::list<SignalHandler>& handlers = handlerLists[signal];
 
-        for(SignalHandler& signalHandler : handlers) {
-        	signalHandler(signal);
+for(SignalHandler& signalHandler : handlers)
+        {
+            signalHandler(signal);
         }
     }
 };

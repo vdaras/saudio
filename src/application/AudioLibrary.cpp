@@ -28,70 +28,82 @@
 #include "system/filesystem/DirectoryFactory.h"
 #include "system/filesystem/FileSystemUtils.h"
 
-std::set<std::string> AudioLibrary::SupportedFileTypes = {
-	".mp3",
-	".ogg",
-	".wav"
+std::set<std::string> AudioLibrary::SupportedFileTypes =
+{
+    ".mp3",
+    ".ogg",
+    ".wav"
 };
 
-AudioLibrary::AudioLibrary(const std::string& rootDirectoryPath) 
-: rootDirectoryPath(rootDirectoryPath) {
+AudioLibrary::AudioLibrary(const std::string& rootDirectoryPath)
+    : rootDirectoryPath(rootDirectoryPath)
+{
 
-	std::unique_ptr<Directory> dir = DirectoryFactory::CreateDirectoryTree(rootDirectoryPath);
+    std::unique_ptr<Directory> dir = DirectoryFactory::CreateDirectoryTree(rootDirectoryPath);
 
-	CompileFileList(dir.get(), "");
+    CompileFileList(dir.get(), "");
 }
 
-bool AudioLibrary::SupportsFileType(const std::string& filePath) const {
+bool AudioLibrary::SupportsFileType(const std::string& filePath) const
+{
 
     std::string extension = FindExtension(filePath);
 
     std::transform(extension.begin(), extension.end(), extension.begin(), tolower);
 
-	return SupportedFileTypes.find(extension) != SupportedFileTypes.end();
+    return SupportedFileTypes.find(extension) != SupportedFileTypes.end();
 }
 
-bool AudioLibrary::FileExists(const std::string& filePath) const {
+bool AudioLibrary::FileExists(const std::string& filePath) const
+{
     return std::find(audioFiles.begin(), audioFiles.end(), filePath) != audioFiles.end();
 }
 
 
-std::string AudioLibrary::GetFullPath(const std::string& filePath) const {
+std::string AudioLibrary::GetFullPath(const std::string& filePath) const
+{
     return rootDirectoryPath + filePath;
 }
 
 
-std::forward_list<const std::string*> AudioLibrary::Search(const std::string& keyword) const {
+std::forward_list<const std::string*> AudioLibrary::Search(const std::string& keyword) const
+{
 
     std::forward_list<const std::string*> results;
 
-    for(const std::string& file : audioFiles) {
+for(const std::string& file : audioFiles)
+    {
 
-    	if(file.find(keyword) != std::string::npos) {
+        if(file.find(keyword) != std::string::npos)
+        {
             results.push_front(&file);
-    	}
+        }
     }
 
     return results;
 }
 
-void AudioLibrary::CompileFileList(Directory* dir, std::string path) {
+void AudioLibrary::CompileFileList(Directory* dir, std::string path)
+{
 
-	for(Directory* subDir : dir->GetSubDirectories()) {
-		
-		std::string name = subDir->GetName();
+for(Directory* subDir : dir->GetSubDirectories())
+    {
 
-		CompileFileList(subDir, path + name + "/");
-	}
+        std::string name = subDir->GetName();
 
-	for(const std::string& file : dir->GetFiles()) {
+        CompileFileList(subDir, path + name + "/");
+    }
 
-        if(SupportsFileType(file)) {
+for(const std::string& file : dir->GetFiles())
+    {
 
-			std::string filePath = path + file;
+        if(SupportsFileType(file))
+        {
 
-			audioFiles.push_front(filePath);	
+            std::string filePath = path + file;
+
+            audioFiles.push_front(filePath);
 
         }
-	}
+    }
 }

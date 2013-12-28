@@ -20,18 +20,21 @@
 #include "ArgumentException.h"
 
 
-const char* InsufficientArgumentsException::what() const noexcept {
-	return "Insufficient command line arguments.";
+const char* InsufficientArgumentsException::what() const noexcept
+{
+    return "Insufficient command line arguments.";
 }
 
 /////////////////////////////////////////////////////////////////////////////////
 
-InvalidArgumentException::InvalidArgumentException(const std::string& argName, const std::string& argValue) 
-: argName(argName),
-  argValue(argValue) {
+InvalidArgumentException::InvalidArgumentException(const std::string& argName, const std::string& argValue)
+    : argName(argName),
+      argValue(argValue)
+{
 
 }
 
-const char* InvalidArgumentException::what() const noexcept {
-	return ("Argument: " + argName + " has invalid value: " + argValue).c_str();
+const char* InvalidArgumentException::what() const noexcept
+{
+    return ("Argument: " + argName + " has invalid value: " + argValue).c_str();
 }

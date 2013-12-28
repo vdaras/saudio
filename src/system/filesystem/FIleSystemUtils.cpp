@@ -19,7 +19,8 @@
 
 #include "FileSystemUtils.h"
 
-std::string FindExtension(const std::string& filePath) {
-	size_t extensionPos = filePath.rfind('.');
-	return extensionPos != std::string::npos ? filePath.substr(extensionPos) : "";
+std::string FindExtension(const std::string& filePath)
+{
+    size_t extensionPos = filePath.rfind('.');
+    return extensionPos != std::string::npos ? filePath.substr(extensionPos) : "";
 }

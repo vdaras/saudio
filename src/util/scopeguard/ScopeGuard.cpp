@@ -19,23 +19,28 @@
 
 #include "ScopeGuard.h"
 
-ScopeGuard::ScopeGuard() 
-: dismissed(false) {
+ScopeGuard::ScopeGuard()
+    : dismissed(false)
+{
 
 }
 
-ScopeGuard::ScopeGuard(ScopeGuard&& rvalue) 
-: dismissed(rvalue.dismissed) {
-	rvalue.Dismiss();
+ScopeGuard::ScopeGuard(ScopeGuard&& rvalue)
+    : dismissed(rvalue.dismissed)
+{
+    rvalue.Dismiss();
 }
 
-ScopeGuard::~ScopeGuard() {
+ScopeGuard::~ScopeGuard()
+{
 }
 
-void ScopeGuard::Dismiss() const {
-	dismissed = true;
+void ScopeGuard::Dismiss() const
+{
+    dismissed = true;
 }
 
-bool ScopeGuard::IsDismissed() const {
-	return dismissed;
+bool ScopeGuard::IsDismissed() const
+{
+    return dismissed;
 }

@@ -30,21 +30,24 @@
 #include "util/scopeguard/SimpleScopeGuard.h"
 
 Server::Server(unsigned short port, unsigned maxConnections, unsigned servingThreads)
-: serverSocket(ServerSocketFactory::CreateServerSocket(port)),
-  maxConnections(maxConnections),
-  running(false),
-  threadPool(servingThreads) { 
+    : serverSocket(ServerSocketFactory::CreateServerSocket(port)),
+      maxConnections(maxConnections),
+      running(false),
+      threadPool(servingThreads)
+{
 
     serverSocket->Open();
 
 }
 
 
-Server::~Server() {
+Server::~Server()
+{
 }
 
 
-void Server::Run() {
+void Server::Run()
+{
 
     serverSocket->Listen(maxConnections);
 
@@ -52,42 +55,53 @@ void Server::Run() {
 
     running = true;
 
-    while(running) {
-        
-        if(serverSocket->IsReady()) {
+    while(running)
+    {
 
-            try {
+        if(serverSocket->IsReady())
+        {
+
+            try
+            {
 
                 std::shared_ptr<ISocket> clientSocket = serverSocket->Accept();
 
                 //stop receiving if 5 seconds pass and client doesn't send data
                 clientSocket->SetReceiveTimeout(5);
-			
-                threadPool.EnqueueTask([=]() {
+
+                threadPool.EnqueueTask([=]()
+                {
                     this->ServeClient(clientSocket);
                 });
 
-            } catch(const SystemException& e) {
-                
+            }
+            catch(const SystemException& e)
+            {
+
                 std::lock_guard<std::mutex> guard(stderrMutex);
                 std::cerr << e.what() << '\n';
- 
-            } 
+
+            }
         }
     }
 }
 
-void Server::Stop() {
-	running = false;
+void Server::Stop()
+{
+    running = false;
 }
 
-void Server::ServeClient(std::shared_ptr<ISocket> clientSocket) {
+void Server::ServeClient(std::shared_ptr<ISocket> clientSocket)
+{
 
-    try {
+    try
+    {
 
         Serve(clientSocket);
 
-    } catch (const std::exception& e) {
+    }
+    catch(const std::exception& e)
+    {
 
         std::lock_guard<std::mutex> guard(stderrMutex);
         std::cerr << e.what();

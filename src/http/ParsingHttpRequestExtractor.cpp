@@ -21,28 +21,33 @@
 
 #include "HttpRequest.h"
 
-std::string ParsingHttpRequestExtractor::ExtractGET(const HttpRequest& request) const {
-   
+std::string ParsingHttpRequestExtractor::ExtractGET(const HttpRequest& request) const
+{
+
     const std::string& message = request.GetMessage();
 
     size_t methodStart = message.find("GET");
-    if(methodStart == std::string::npos) {
+    if(methodStart == std::string::npos)
+    {
         throw HttpExtractionException("No GET line in HTTP request.");
     }
 
     size_t methodEnd = message.find("\r\n", methodStart);
-    if(methodEnd == std::string::npos) {
-    	throw HttpExtractionException("GET line doesn't end with carriage return in HTTP request.");
+    if(methodEnd == std::string::npos)
+    {
+        throw HttpExtractionException("GET line doesn't end with carriage return in HTTP request.");
     }
 
     size_t requestPathStart = message.find_first_not_of(' ', methodStart + 3);
-    if(requestPathStart == std::string::npos) {
+    if(requestPathStart == std::string::npos)
+    {
         throw HttpExtractionException("Malformed GET line.");
     }
 
     size_t requestPathEnd = message.find_first_of(' ', requestPathStart);
-    if(requestPathEnd == std::string::npos) {
-    	throw HttpExtractionException("Malformed GET line.");
+    if(requestPathEnd == std::string::npos)
+    {
+        throw HttpExtractionException("Malformed GET line.");
     }
 
     return message.substr(requestPathStart, requestPathEnd - requestPathStart);
@@ -50,22 +55,26 @@ std::string ParsingHttpRequestExtractor::ExtractGET(const HttpRequest& request) 
 
 
 
-std::string ParsingHttpRequestExtractor::ExtractHOST(const HttpRequest& request) const {
+std::string ParsingHttpRequestExtractor::ExtractHOST(const HttpRequest& request) const
+{
 
     const std::string& message = request.GetMessage();
 
     size_t hostStart = message.find("Host:");
-    if(hostStart == std::string::npos) {
+    if(hostStart == std::string::npos)
+    {
         throw HttpExtractionException("No Host line in HTTP request.");
     }
 
     size_t hostEnd = message.find("\r\n", hostStart);
-    if(hostEnd == std::string::npos) {
+    if(hostEnd == std::string::npos)
+    {
         throw HttpExtractionException("Host line doesn't end with carriage return in HTTP request.");
     }
 
     size_t hostNameStart = message.find_first_not_of(' ', hostStart + 5);
-    if(hostNameStart == std::string::npos) {
+    if(hostNameStart == std::string::npos)
+    {
         throw HttpExtractionException("Malformed Host line");
     }
 

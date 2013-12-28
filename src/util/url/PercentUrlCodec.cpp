@@ -19,7 +19,8 @@
 
 #include "PercentUrlCodec.h"
 
-bool PercentURLCodec::IsReservedCharacter(char c) {
+bool PercentURLCodec::IsReservedCharacter(char c)
+{
     return c == '/'  ||
            c == ','  ||
            c == '\'' ||
@@ -40,28 +41,36 @@ bool PercentURLCodec::IsReservedCharacter(char c) {
            c == '!'  ;
 }
 
-char PercentURLCodec::FromHex(char ch) {
-  return isdigit(ch) ? ch - '0' : tolower(ch) - 'a' + 10;
+char PercentURLCodec::FromHex(char ch)
+{
+    return isdigit(ch) ? ch - '0' : tolower(ch) - 'a' + 10;
 }
 
-std::string PercentURLCodec::EncodeURL(const std::string& url) const {
+std::string PercentURLCodec::EncodeURL(const std::string& url) const
+{
     static const char hex[] = "0123456789abcdef";
 
     int urlLength = url.length();
-    
+
     //allocate a string big enough for the worst-case scenario (all chars in the url need to be encoded)
     std::string encodedUrl;
     encodedUrl.reserve(urlLength * 3);
 
-    for(const char& c : url) {
-        if(IsReservedCharacter(c)) {
+for(const char& c : url)
+    {
+        if(IsReservedCharacter(c))
+        {
             encodedUrl += '%';
             encodedUrl += hex[(c >> 4) & 15];
             encodedUrl += hex[(c & 15) & 15];
-        } else if(c == ' ') {
-        	encodedUrl += '+';
-        } else {
-        	encodedUrl += c;
+        }
+        else if(c == ' ')
+        {
+            encodedUrl += '+';
+        }
+        else
+        {
+            encodedUrl += c;
         }
     }
 
@@ -69,32 +78,40 @@ std::string PercentURLCodec::EncodeURL(const std::string& url) const {
 }
 
 
-std::string PercentURLCodec::DecodeURL(const std::string& encodedUrl) const {
+std::string PercentURLCodec::DecodeURL(const std::string& encodedUrl) const
+{
     int urlLength = encodedUrl.length();
-    
+
     //allocate a string big enough for the worst-case scenario (all chars in the url are not encoded)
     std::string decodedUrl;
     decodedUrl.reserve(urlLength);
 
-    for(int i = 0; i < urlLength; ) {
+    for(int i = 0; i < urlLength;)
+    {
 
         char c = encodedUrl[i];
 
-    	if(c == '%') {
+        if(c == '%')
+        {
 
-    		if(i + 2 < urlLength) {
+            if(i + 2 < urlLength)
+            {
                 decodedUrl += FromHex(encodedUrl[i+1]) << 4 | FromHex(encodedUrl[i+2]);
-    		}
+            }
 
-    		i += 3;
+            i += 3;
 
-    	} else if(c == '+') {
+        }
+        else if(c == '+')
+        {
             decodedUrl += ' ';
             i++;
-    	} else {
+        }
+        else
+        {
             decodedUrl += c;
             i++;
-    	}
+        }
     }
 
     return decodedUrl;

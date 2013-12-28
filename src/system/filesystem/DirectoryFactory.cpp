@@ -27,43 +27,50 @@
 
 #include "system/SystemException.h"
 
-std::unique_ptr<Directory> DirectoryFactory::CreateDirectoryTree(const std::string& rootDirectory) {
-    
+std::unique_ptr<Directory> DirectoryFactory::CreateDirectoryTree(const std::string& rootDirectory)
+{
+
     Directory* root = new Directory("");
-    
-    #if defined __unix__ || (defined (__APPLE__) && defined (__MACH__))
+
+#if defined __unix__ || (defined (__APPLE__) && defined (__MACH__))
     PopulateDirectoryUnix(root, rootDirectory);
-    #else
+#else
     throw new UnsupportedOSException();
-    #endif
+#endif
 
     return std::unique_ptr<Directory>(root);
 }
 
 #if defined __unix__ || (defined (__APPLE__) && defined (__MACH__))
-void DirectoryFactory::PopulateDirectoryUnix(Directory* directory, const std::string& directoryPath) {
+void DirectoryFactory::PopulateDirectoryUnix(Directory* directory, const std::string& directoryPath)
+{
 
-    DIR *current = opendir(directoryPath.c_str());
+    DIR* current = opendir(directoryPath.c_str());
 
     dirent* directoryEntry = readdir(current);
-    while(directoryEntry != NULL) {
+    while(directoryEntry != NULL)
+    {
 
-   		std::string name(directoryEntry->d_name);
+        std::string name(directoryEntry->d_name);
 
-    	if(directoryEntry->d_type == DT_DIR) {
-    		if(name != "." && name != "..") {
+        if(directoryEntry->d_type == DT_DIR)
+        {
+            if(name != "." && name != "..")
+            {
 
-    			Directory* subDirectory = new Directory(name, directory);
+                Directory* subDirectory = new Directory(name, directory);
 
-    			PopulateDirectoryUnix(subDirectory, directoryPath + '/' + name);
+                PopulateDirectoryUnix(subDirectory, directoryPath + '/' + name);
 
-    			directory->subDirectories.push_front(subDirectory);
-    		}
-    	} else {
-    		directory->files.push_front(name);
-    	}
+                directory->subDirectories.push_front(subDirectory);
+            }
+        }
+        else
+        {
+            directory->files.push_front(name);
+        }
 
-    	directoryEntry = readdir(current);
+        directoryEntry = readdir(current);
     }
 
     closedir(current);

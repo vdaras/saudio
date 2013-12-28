@@ -20,14 +20,17 @@
 #include "GenericAudioStreamerException.h"
 
 GenericAudioStreamerException::GenericAudioStreamerException(const std::string& message)
-: message(message) {
+    : message(message)
+{
 
 }
 
-GenericAudioStreamerException::~GenericAudioStreamerException() noexcept {
-	
+GenericAudioStreamerException::~GenericAudioStreamerException() noexcept
+{
+
 }
 
-const char* GenericAudioStreamerException::what() const noexcept {
+const char* GenericAudioStreamerException::what() const noexcept
+{
     return message.c_str();
 }

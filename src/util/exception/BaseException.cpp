@@ -20,14 +20,17 @@
 #include "BaseException.h"
 
 BaseException::BaseException(const std::string& message)
-: message(message) {
+    : message(message)
+{
 
 }
 
-BaseException::~BaseException() noexcept {
+BaseException::~BaseException() noexcept
+{
 
 }
 
-const char* BaseException::what() const noexcept {
-	return message.c_str();
+const char* BaseException::what() const noexcept
+{
+    return message.c_str();
 }

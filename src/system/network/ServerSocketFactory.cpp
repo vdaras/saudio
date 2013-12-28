@@ -22,10 +22,11 @@
 #include "system/SystemException.h"
 #include "unix/BSDServerSocket.h"
 
-std::unique_ptr<IServerSocket> ServerSocketFactory::CreateServerSocket(int port, bool open) {
-	#if defined __unix__ || (defined (__APPLE__) && defined (__MACH__))
-	return std::unique_ptr<IServerSocket>(new BSDServerSocket(port, open));
-	#endif
+std::unique_ptr<IServerSocket> ServerSocketFactory::CreateServerSocket(int port, bool open)
+{
+#if defined __unix__ || (defined (__APPLE__) && defined (__MACH__))
+    return std::unique_ptr<IServerSocket>(new BSDServerSocket(port, open));
+#endif
 
-	throw UnsupportedOSException();
+    throw UnsupportedOSException();
 }

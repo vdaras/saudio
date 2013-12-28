@@ -23,35 +23,39 @@
 #include <sstream>
 
 HttpResponse::HttpResponse(HttpVersion version, HttpResponseCode code, HttpContentType contentType, unsigned contentLength)
-: version(version),
-  code(code),
-  contentType(contentType),
-  contentLength(contentLength) {
+    : version(version),
+      code(code),
+      contentType(contentType),
+      contentLength(contentLength)
+{
 }
 
 HttpResponse::HttpResponse(HttpVersion version, HttpResponseCode code, HttpContentType contentType, unsigned contentLength, const std::string& attachmentName)
-: version(version),
-  code(code),
-  contentType(contentType),
-  contentLength(contentLength),
-  attachmentName(attachmentName) {
+    : version(version),
+      code(code),
+      contentType(contentType),
+      contentLength(contentLength),
+      attachmentName(attachmentName)
+{
 }
 
 
-HttpResponse::~HttpResponse() {
+HttpResponse::~HttpResponse()
+{
 
 }
 
 
-std::string HttpResponse::GenerateHeader() const {
-   
+std::string HttpResponse::GenerateHeader() const
+{
+
     std::stringstream header;
     header << HTTP_VERSION_TO_MESSAGE[version] << " " << code << " " << HTTP_CODE_TO_MESSAGE[code] << "\r\n";
     header << "Content-Type: " << HTTP_CONTENT_TYPE_TO_MESSAGE[contentType] << "\r\n";
     header << "Content-Length: " << contentLength << "\r\n";
-    if(!attachmentName.empty()) 
-    	header << "Content-Disposition: attachment; filename=" << attachmentName << "\r\n";
+    if(!attachmentName.empty())
+        header << "Content-Disposition: attachment; filename=" << attachmentName << "\r\n";
     header << "Connection: close\r\n\r\n";
 
-    return header.str(); 
+    return header.str();
 }
