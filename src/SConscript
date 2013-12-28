@@ -1,0 +1,18 @@
+import os
+
+Import('env')
+
+#compile list of all files
+all_files = []
+
+for root, dirs, files in os.walk('.'):
+    for file in files:
+        filepath = os.path.join(root, file)
+        filepath = filepath[2:]
+        all_files.append(os.path.join('src', filepath))
+
+header_files = [f for f in all_files if f.endswith('.h') or f.endswith('.hpp')]
+source_files = [f for f in all_files if f.endswith('.cpp') or f.endswith('.cxx') or f.endswith('.c')]
+
+
+Export('source_files')
