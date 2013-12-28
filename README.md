@@ -41,7 +41,7 @@ be used
 It is possible for a client to search the server's available audio files by
 using a URL like this
 
-   http://hostname:port/songsearch/keyword
+    http://hostname:port/songsearch/keyword
 
 The server's response will be an .m3u file containing all URLs for files matching
 the keyword.
