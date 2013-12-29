@@ -56,6 +56,7 @@ AudioStreamingServer::~AudioStreamingServer() {
 void AudioStreamingServer::Serve(const std::shared_ptr<ISocket>& clientSocket)
 {
     try {
+        
         char recvBuffer[DEFAULT_BUFFER_SIZE];
         int read = clientSocket->Receive(recvBuffer, DEFAULT_BUFFER_SIZE);
         HttpRequest request(recvBuffer, read);
@@ -65,23 +66,25 @@ void AudioStreamingServer::Serve(const std::shared_ptr<ISocket>& clientSocket)
 
         const char* songsearch = "/songsearch/";
         if(requestUrl.find(songsearch) == 0) {
+            
             std::string keyword = requestUrl.substr(strlen(songsearch));
             SendMediaList(clientSocket, keyword, httpExtractor->ExtractHOST(request));
+
         } else if(audioLibrary->FileExists(requestUrl.substr(1))) {
+
             std::ifstream audioFile(audioLibrary->GetFullPath(requestUrl), std::ifstream::binary);
             if(audioFile.is_open()) {
                 std::string extension = FindExtension(requestUrl);
                 std::transform(extension.begin(), extension.end(), extension.begin(), tolower);
                 StreamFile(clientSocket, audioFile, EXTENSION_TO_CONTENT_TYPE[extension]);
+            } else {
+                SendNotFound(clientSocket);
             }
+
         } else {
-            static const char* notFoundContent = "<h1>File Not Found</h1>";
-            unsigned notFoundContentLength = strlen(notFoundContent);
- 
-            HttpResponse response(HTTP_1_1, NOT_FOUND, NONE, notFoundContentLength);
-            SendResponseHeader(clientSocket, response);
-            clientSocket->Send(notFoundContent, notFoundContentLength);
+            SendNotFound(clientSocket);
         }
+
     } catch(const GenericAudioStreamerException& e) {
         std::lock_guard<std::mutex> guard(stderrMutex);
         std::cerr << e.what();
@@ -136,8 +139,18 @@ void AudioStreamingServer::SendMediaList(const std::shared_ptr<ISocket>& clientS
 
     HttpResponse response(HTTP_1_1, OK, M3U, responseSize, keyword + ".m3u");
     SendResponseHeader(clientSocket, response);
-    for(const std::string& url : urls)
-    {
+    for(const std::string& url : urls) {
         clientSocket->Send(url.c_str(), url.size());
     }
+}
+
+
+void AudioStreamingServer::SendNotFound(const std::shared_ptr<ISocket>& clientSocket) const {
+
+    static const char* notFoundContent = "<h1>File Not Found</h1>";
+    static const unsigned notFoundContentLength = strlen(notFoundContent);
+
+    HttpResponse response(HTTP_1_1, NOT_FOUND, NONE, notFoundContentLength);
+    SendResponseHeader(clientSocket, response);
+    clientSocket->Send(notFoundContent, notFoundContentLength);
 }

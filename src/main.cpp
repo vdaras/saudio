@@ -81,6 +81,7 @@ std::unique_ptr<Server> CreateServer(int argc, char* argv[]) {
             if(libraryDirectory[libraryDirectory.length() - 1] != '/') {
                 libraryDirectory += '/';
             }
+
         } else {
             throw InsufficientArgumentsException();
         }
@@ -89,10 +90,13 @@ std::unique_ptr<Server> CreateServer(int argc, char* argv[]) {
         unsigned maxConnections = argValues.find('c') != argValues.end() ?
                                   std::stoi(argValues['c']) :
                                   DEFAULT_MAX_CONNECTIONS;
+        
         unsigned servingThreads = argValues.find('t') != argValues.end() ?
                                   std::stoi(argValues['t']) :
                                   maxConnections;
+        
         return std::unique_ptr<Server>(new AudioStreamingServer(portNo, maxConnections, servingThreads, libraryDirectory));
+
     } catch(const std::invalid_argument& e) {
         throw InvalidArgumentException("c", argValues['c']);
     } catch(const std::system_error& e) {
@@ -112,17 +116,21 @@ int main(int argc, char* argv[]) {
         std::cout << e.what() << '\n';
         return -1;
     }
+
     //install signal handlers
     signal(SIGINT, &InvokeSignalHandlers);
     signal(EINTR, &InvokeSignalHandlers);
+    
     //ignore signal when client gets disconnected in a thread
     signal(SIGPIPE, SIG_IGN);
     auto stopServerCallback = [&](int signal) {
         server->Stop();
     };
+
     //stop the server gracefully if a SIGINT or EINTR is received
     AddSignalHandler(SIGINT, stopServerCallback);
     AddSignalHandler(EINTR, stopServerCallback);
+
     try {
         server->Run();
     } catch(const std::exception& e) {

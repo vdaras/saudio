@@ -116,6 +116,15 @@ class AudioStreamingServer : public Server {
      *        Name of the host to create URLs in M3U for.
      */
     void SendMediaList(const std::shared_ptr<ISocket>& clientSocket, const std::string& keyword, const std::string& hostname) const;
+
+
+    /**
+     * Responds a 404 HTTP message.
+     *
+     * @param clientSocket
+     *        Client's socket to send the message over.
+     */
+    void SendNotFound(const std::shared_ptr<ISocket>& clientSocket) const;
 };
 
 #endif

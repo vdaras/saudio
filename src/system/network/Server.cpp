@@ -50,7 +50,9 @@ void Server::Run() {
     while(running) {
     
         if(serverSocket->IsReady()) {
+
             try {
+                
                 std::shared_ptr<ISocket> clientSocket = serverSocket->Accept();
   
                 //stop receiving if 5 seconds pass and client doesn't send data
@@ -64,6 +66,7 @@ void Server::Run() {
                 std::lock_guard<std::mutex> guard(stderrMutex);
                 std::cerr << e.what() << '\n';
             }
+
         }
     }
 }
