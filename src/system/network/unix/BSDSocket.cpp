@@ -95,6 +95,7 @@ void BSDSocket::Send(const char buffer[], unsigned n) const {
     int toSend = static_cast<int>(n);
     while(toSend > 0) {
         int totalSent = send(descriptor, buffer, toSend, 0);
+        buffer += totalSent;
         toSend -= totalSent;
     }
 }
