@@ -68,7 +68,10 @@ std::forward_list<const std::string*> AudioLibrary::Search(const std::string& ke
 
 
 void AudioLibrary::CompileFileList(Directory* dir, std::string path) {
-  
+
+    if(!dir)
+        return;
+
     for(Directory* subDir : dir->GetSubDirectories()) {
         std::string name = subDir->GetName();
         CompileFileList(subDir, path + name + "/");

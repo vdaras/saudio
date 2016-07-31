@@ -23,6 +23,7 @@
 //system includes
 #if defined __unix__ || (defined (__APPLE__) && defined (__MACH__))
 #include <dirent.h>
+#include <errno.h>
 #endif
 
 #include "system/SystemException.h"
@@ -41,6 +42,11 @@ std::unique_ptr<Directory> DirectoryFactory::CreateDirectoryTree(const std::stri
 #if defined __unix__ || (defined (__APPLE__) && defined (__MACH__))
 void DirectoryFactory::PopulateDirectoryUnix(Directory* directory, const std::string& directoryPath) {
     DIR* current = opendir(directoryPath.c_str());
+    if(!current)
+    {
+        throw SystemException(strerror(errno));
+    }
+
     dirent* directoryEntry = readdir(current);
     while(directoryEntry != NULL) {
         std::string name(directoryEntry->d_name);
