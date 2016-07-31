@@ -23,6 +23,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <thread>
 
 #include "application/AudioStreamingServer.h"
 #include "application/exception/ArgumentException.h"
@@ -94,6 +95,7 @@ std::unique_ptr<Server> CreateServer(int argc, char* argv[]) {
         unsigned servingThreads = argValues.find('t') != argValues.end() ?
                                   std::stoi(argValues['t']) :
                                   maxConnections;
+        servingThreads = std::min(servingThreads, std::thread::hardware_concurrency());
         
         return std::unique_ptr<Server>(new AudioStreamingServer(portNo, maxConnections, servingThreads, libraryDirectory));
 
