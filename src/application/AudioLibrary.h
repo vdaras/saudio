@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2014, Vasileios Daras. All rights reserved.
+ * Copyright (c) 2011-2017, Vasileios Daras. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -94,7 +94,7 @@ class AudioLibrary {
      *         A list of all files that matched the search.
      * 
      */
-    std::forward_list<const std::string*> Search(const std::string& keyword) const;
+    std::forward_list<std::reference_wrapper<const std::string>> Search(const std::string& keyword) const;
 
     private:
 

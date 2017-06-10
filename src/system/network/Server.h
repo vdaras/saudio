@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2014, Vasileios Daras. All rights reserved.
+ * Copyright (c) 2011-2017, Vasileios Daras. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,14 +29,15 @@
 
 #include "application/AudioLibrary.h"
 #include "util/threading/ThreadPool.h"
-#include "IServerSocket.h"
+#include "ServerSocket.h"
+#include "Socket.h"
 
 /**
  * Class encapsulating functionality for the server.
  */
 class Server {
 
-    std::unique_ptr<IServerSocket> serverSocket;
+    ServerSocket serverSocket;
    
     unsigned maxConnections;
 
@@ -95,7 +96,7 @@ class Server {
     /**
      * Code that serves the client goes here
      */
-    virtual void Serve(const std::shared_ptr<ISocket>& clientSocket) = 0;
+    virtual void Serve(Socket& clientSocket) = 0;
 
     private: 
 
@@ -105,7 +106,7 @@ class Server {
      * @param clientSocket
      *        Client's socket.
      */
-    void ServeClient(std::shared_ptr<ISocket> clientSocket);
+    void ServeClient(Socket& clientSocket);
 };
 
 #endif

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2014, Vasileios Daras. All rights reserved.
+ * Copyright (c) 2011-2017, Vasileios Daras. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -56,11 +56,11 @@ std::string AudioLibrary::GetFullPath(const std::string& filePath) const {
 }
 
 
-std::forward_list<const std::string*> AudioLibrary::Search(const std::string& keyword) const {
-    std::forward_list<const std::string*> results;
+std::forward_list<std::reference_wrapper<const std::string>> AudioLibrary::Search(const std::string& keyword) const {
+    std::forward_list<std::reference_wrapper<const std::string>> results;
     for(const std::string& file : audioFiles) {
         if(file.find(keyword) != std::string::npos) {
-            results.push_front(&file);
+            results.push_front(std::reference_wrapper<const std::string>(file));
         }
     }
     return results;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2014, Vasileios Daras. All rights reserved.
+ * Copyright (c) 2011-2017, Vasileios Daras. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

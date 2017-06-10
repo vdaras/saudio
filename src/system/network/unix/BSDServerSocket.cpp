@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2014, Vasileios Daras. All rights reserved.
+ * Copyright (c) 2011-2017, Vasileios Daras. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -106,21 +106,27 @@ bool BSDServerSocket::IsReady() const {
     return false;
 }
 
-std::shared_ptr<ISocket> BSDServerSocket::Accept() const {
+
+SocketTemplate<BSDSocket> BSDServerSocket::Accept() const {
     sockaddr_in clientAddress;
     socklen_t addressLength = sizeof(clientAddress);
     int descriptor = accept(GetDescriptor(), (sockaddr*) &clientAddress, &addressLength);
     if(descriptor == -1) {
         throw NetworkException(strerror(errno));
     }
-    return std::make_shared<BSDSocket>(BSDSocket(descriptor));
+    
+    //don't emit SIGPIPE if the client stops sending data
+    int set = 1;
+    auto ret = setsockopt(descriptor, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
+    if(ret == -1) {
+        throw NetworkException(strerror(errno));
+    }
+    return SocketTemplate<BSDSocket>(descriptor);
 }
+
 
 unsigned short BSDServerSocket::GetPort() const {
     return portNo;
 }
-
-
-
 
 #endif

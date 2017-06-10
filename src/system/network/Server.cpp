@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2014, Vasileios Daras. All rights reserved.
+ * Copyright (c) 2011-2017, Vasileios Daras. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,18 +21,17 @@
 
 //standard library includes
 #include <iostream>
+#include <future>
 
-#include "ServerSocketFactory.h"
 #include "system/SystemException.h"
-#include "util/scopeguard/SimpleScopeGuard.h"
 
 Server::Server(unsigned short port, unsigned maxConnections, unsigned servingThreads)
-: serverSocket(ServerSocketFactory::CreateServerSocket(port)),
+: serverSocket(port),
   maxConnections(maxConnections),
   running(false),
   threadPool(servingThreads) {
 
-    serverSocket->Open();
+    serverSocket.Open();
 
 }
 
@@ -43,23 +42,24 @@ Server::~Server() {
 
 void Server::Run() {
 
-    serverSocket->Listen(maxConnections);
-    std::cout << "Server now listening for incoming connections at port " << serverSocket->GetPort() << '\n';
+    serverSocket.Listen(maxConnections);
+    std::cout << "Server now listening for incoming connections at port " << serverSocket.GetPort() << '\n';
+
+    threadPool.Startup();
 
     running = true;
     while(running) {
     
-        if(serverSocket->IsReady()) {
+        if(serverSocket.IsReady()) {
 
             try {
                 
-                std::shared_ptr<ISocket> clientSocket = serverSocket->Accept();
-  
-                //stop receiving if 5 seconds pass and client doesn't send data
-                clientSocket->SetReceiveTimeout(5);
-  
-                threadPool.EnqueueTask([=]() {
-                    this->ServeClient(clientSocket);
+                auto clientSocketPtr = std::make_shared<Socket>(serverSocket.Accept());
+
+                threadPool.EnqueueTask([this, clientSocketPtr]() mutable {
+                    clientSocketPtr->SetReceiveTimeout(1);
+                    clientSocketPtr->SetSendTimeout(1);
+                    this->ServeClient(*clientSocketPtr);
                 });
 
             } catch(const SystemException& e) {
@@ -77,15 +77,28 @@ void Server::Stop() {
 }
 
 
-void Server::ServeClient(std::shared_ptr<ISocket> clientSocket) {
+void Server::ServeClient(Socket& clientSocket) {
  
     try {
 
+        {
+            std::lock_guard<std::mutex> guard(stdoutMutex);
+            std::cout << "Serving new client...\n";
+        }
+    
         Serve(clientSocket);
+
+        {
+            std::lock_guard<std::mutex> guard(stdoutMutex);
+            std::cout << "Client served..\n";
+        }
 
     } catch(const std::exception& e) {
         std::lock_guard<std::mutex> guard(stderrMutex);
-        std::cerr << e.what();
+        std::cerr << e.what() << '\n';
+    } catch(...) {
+        std::lock_guard<std::mutex> guard(stderrMutex);
+        std::cerr << "Unexpected error!\n";
     }
-    clientSocket->Close();
+    clientSocket.Close();
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2014, Vasileios Daras. All rights reserved.
+ * Copyright (c) 2011-2017, Vasileios Daras. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,49 +20,66 @@
 #include "ThreadPool.h"
 
 ThreadPool::ThreadPool(unsigned short totalThreads)
-: running(true) {
-    workingThreads.reserve(totalThreads);
-    for(unsigned short i = 0; i < totalThreads; i++) {
-        workingThreads.push_back(std::thread(&ThreadPool::Worker, this));
-    }
+: totalThreads(totalThreads)
+, running(false) {
 }
 
 
 ThreadPool::~ThreadPool() {
-    running = false;
-    for(std::thread& thread : workingThreads) {
-        if(thread.joinable()) {
-            thread.join();
-        }
+    if(running) {
+        Shutdown();
     }
 }
 
+void ThreadPool::Startup() {
 
-void ThreadPool::EnqueueTask(const std::function<void()>& task) {
-    std::lock_guard<std::mutex> queueLock(queueMutex);
-    tasks.push(std::move(task));
+    if(!running) {
+        running = true;
+        decltype(workingThreads) tempWorkingThreads(new std::thread[totalThreads]);
+        for(unsigned short i = 0; i < totalThreads; i++) {
+            tempWorkingThreads[i] = std::thread(&ThreadPool::Worker, this);
+        }
+        workingThreads.swap(tempWorkingThreads);
+    }
 }
 
+void ThreadPool::Shutdown() {
+
+    if(running) {
+        running = false;
+        resumeWorker.notify_all();
+        for(unsigned short i = 0; i < totalThreads; i++) {
+            if(workingThreads[i].joinable()) {
+                workingThreads[i].join();
+            }
+        }
+        workingThreads.reset();
+    }
+}
 
 void ThreadPool::Worker() {
-    while(running) {
+    
+    while(true) {
+
+        std::unique_lock<std::mutex> lock(queueMutex);
+        resumeWorker.wait(lock, [this] {
+            return !running || !tasks.empty();
+        });
+
+        if(!running)
+            return;
+
         std::function<void()> task;
-        if(DequeueTask(&task)) {
-            task();
-        } else {
-            std::this_thread::yield();
-        }
+        DequeueTask(&task);
+        lock.unlock();
+        
+        task();
     }
 }
 
 
-bool ThreadPool::DequeueTask(std::function<void()>* taskOut) {
-    std::lock_guard<std::mutex> queueLock(queueMutex);
-    if(!tasks.empty()) {
-        *taskOut = tasks.front();
-        tasks.pop();
-        return true;
-    }
-    return false;
+void ThreadPool::DequeueTask(std::function<void()>* taskOut) {
+    *taskOut = tasks.front();
+    tasks.pop();
 }
 

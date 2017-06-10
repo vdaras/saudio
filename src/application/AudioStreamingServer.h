@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2014, Vasileios Daras. All rights reserved.
+ * Copyright (c) 2011-2017, Vasileios Daras. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -39,9 +39,9 @@ class AudioStreamingServer : public Server {
 
 	std::unique_ptr<AudioLibrary> audioLibrary;
 
-    std::unique_ptr<IHttpRequestExtractor> httpExtractor;       //object used to isolate the different parts of an HTTP request
+    std::unique_ptr<IHttpRequestExtractor> httpExtractor; 
 
-    std::unique_ptr<IURLCodec> urlCodec;    //object used to encode/decode URLs
+    std::unique_ptr<IURLCodec> urlCodec;
 
     public:
 
@@ -71,7 +71,7 @@ class AudioStreamingServer : public Server {
     /**
      * Serves the client.
      */
-    virtual void Serve(const std::shared_ptr<ISocket>& clientSocket) override;
+    virtual void Serve(Socket& clientSocket) override;
 
 
     private:
@@ -85,7 +85,7 @@ class AudioStreamingServer : public Server {
      * @param response
      *        Http response to get header from.
      */
-    void SendResponseHeader(const std::shared_ptr<ISocket>& clientSocket, const HttpResponse& response) const;
+    void SendResponseHeader(Socket& clientSocket, const HttpResponse& response) const;
 
     
     /**
@@ -100,7 +100,7 @@ class AudioStreamingServer : public Server {
      * @param file
      *        File to stream.
      */
-    void StreamFile(const std::shared_ptr<ISocket>& clientSocket, std::ifstream& file, HttpContentType contentType) const;
+    void StreamFile(Socket& clientSocket, std::ifstream& file, HttpContentType contentType) const;
 
 
     /**
@@ -115,7 +115,7 @@ class AudioStreamingServer : public Server {
      * @param hostname
      *        Name of the host to create URLs in M3U for.
      */
-    void SendMediaList(const std::shared_ptr<ISocket>& clientSocket, const std::string& keyword, const std::string& hostname) const;
+    void SendMediaList(Socket& clientSocket, const std::string& keyword, const std::string& hostname) const;
 
 
     /**
@@ -124,7 +124,7 @@ class AudioStreamingServer : public Server {
      * @param clientSocket
      *        Client's socket to send the message over.
      */
-    void SendNotFound(const std::shared_ptr<ISocket>& clientSocket) const;
+    void SendNotFound(Socket& clientSocket) const;
 };
 
 #endif

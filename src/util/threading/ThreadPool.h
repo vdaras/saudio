@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2014, Vasileios Daras. All rights reserved.
+ * Copyright (c) 2011-2017s, Vasileios Daras. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -34,13 +34,17 @@
  */
 class ThreadPool {
 
-    std::atomic_bool running;
+    std::unique_ptr<std::thread[]> workingThreads;
 
-    std::vector<std::thread> workingThreads;
+    unsigned short totalThreads;
+
+    bool running;
 
     std::queue<std::function<void()>> tasks;
 
     std::mutex queueMutex;
+
+    std::condition_variable resumeWorker;
 
     public:
 
@@ -52,23 +56,38 @@ class ThreadPool {
      */
     ThreadPool(unsigned short totalThreads);
 
-
     /**
      * Destructor.
      */
     ~ThreadPool();
 
+    /**
+     * Initialises and starts the workers.
+     */
+    void Startup();
+
+    /**
+     * Shuts the workers down.
+     */
+    void Shutdown();
 
     /**
      * Adds a task to the queue.
      */
-    void EnqueueTask(const std::function<void()>& task);
+    template<class Task>
+    void EnqueueTask(Task&& task) {
+
+        {
+            std::lock_guard<std::mutex> queueLock(queueMutex);
+            tasks.push(std::forward<Task>(task));
+        }
+        resumeWorker.notify_one();
+    }
 
     private:
 
     /**
-     * Pops a task from the queue and runs it. If there are no
-     * available tasks, current thread yields.
+     * Pops a task from the queue and runs it. 
      */
     void Worker();
 
@@ -82,7 +101,7 @@ class ThreadPool {
      * @return
      *         Whether there was a task to dequeue or not.     
      */
-    bool DequeueTask(std::function<void()>* taskOut);
+    void DequeueTask(std::function<void()>* taskOut);
 };
 
 #endif

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2014, Vasileios Daras. All rights reserved.
+ * Copyright (c) 2011-2017, Vasileios Daras. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,6 @@
 #include <algorithm>
 #include <cstring>
 #include <iostream>
-#include <sstream>
 
 #include "exception/GenericAudioStreamerException.h"
 #include "http/HttpRequest.h"
@@ -53,13 +52,13 @@ AudioStreamingServer::AudioStreamingServer(unsigned short port, unsigned maxConn
 AudioStreamingServer::~AudioStreamingServer() {
 }
 
-void AudioStreamingServer::Serve(const std::shared_ptr<ISocket>& clientSocket)
+void AudioStreamingServer::Serve(Socket& clientSocket)
 {
     try {
         
-        char recvBuffer[DEFAULT_BUFFER_SIZE];
-        int read = clientSocket->Receive(recvBuffer, DEFAULT_BUFFER_SIZE);
-        HttpRequest request(recvBuffer, read);
+        std::array<char, DEFAULT_BUFFER_SIZE> recvBuffer;
+        int read = clientSocket.Receive(recvBuffer);
+        HttpRequest request(recvBuffer.data(), read);
 
         std::string requestUrl = httpExtractor->ExtractGET(request);
         requestUrl = urlCodec->DecodeURL(requestUrl);
@@ -95,37 +94,39 @@ void AudioStreamingServer::Serve(const std::shared_ptr<ISocket>& clientSocket)
 }
 
 
-void AudioStreamingServer::SendResponseHeader(const std::shared_ptr<ISocket>& clientSocket, const HttpResponse& response) const {
+void AudioStreamingServer::SendResponseHeader(Socket& clientSocket, const HttpResponse& response) const {
     std::string header = response.GenerateHeader();
-    clientSocket->Send(header.c_str(), header.length());
+    std::array<char, DEFAULT_BUFFER_SIZE> buffer;
+    std::copy(std::begin(header), std::end(header), buffer.data());
+    clientSocket.Send(buffer);
 }
 
 
-void AudioStreamingServer::StreamFile(const std::shared_ptr<ISocket>& clientSocket, std::ifstream& file, HttpContentType contentType) const {
+void AudioStreamingServer::StreamFile(Socket& clientSocket, std::ifstream& file, HttpContentType contentType) const {
     file.seekg(0, file.end);
     int fileLength = file.tellg();
     HttpResponse response(HTTP_1_1, OK, contentType, fileLength);
     SendResponseHeader(clientSocket, response);
     
     file.seekg(0, file.beg);
-    char sendbuf[DEFAULT_BUFFER_SIZE] = { 0 };
-    file.read(sendbuf, DEFAULT_BUFFER_SIZE);
+    std::array<char, DEFAULT_BUFFER_SIZE> sendbuf;
+    file.read(sendbuf.data(), DEFAULT_BUFFER_SIZE);
     while(file.gcount() > 0) {
-        clientSocket->Send(sendbuf, file.gcount());
-        file.read(sendbuf, DEFAULT_BUFFER_SIZE);
+        clientSocket.Send(sendbuf, file.gcount());
+        file.read(sendbuf.data(), DEFAULT_BUFFER_SIZE);
     }
 }
 
 
-void AudioStreamingServer::SendMediaList(const std::shared_ptr<ISocket>& clientSocket, const std::string& keyword, const std::string& hostName) const {
+void AudioStreamingServer::SendMediaList(Socket& clientSocket, const std::string& keyword, const std::string& hostName) const {
     
-    const std::forward_list<const std::string*> files = audioLibrary->Search(keyword);
+    const auto files = audioLibrary->Search(keyword);
     std::vector<std::string> urls;
     urls.reserve(std::distance(files.begin(), files.end()));
     
     int responseSize = 0;
-    for(const std::string* file : files) {
-        std::string encodedFile = urlCodec->EncodeURL(*file);
+    for(const auto& file : files) {
+        std::string encodedFile = urlCodec->EncodeURL(file);
         std::string url;
         url.reserve(hostName.length() + encodedFile.length() + 9); //account 2 for '/', '\n' and 7 for 'http://'
         url += "http://";
@@ -139,18 +140,23 @@ void AudioStreamingServer::SendMediaList(const std::shared_ptr<ISocket>& clientS
 
     HttpResponse response(HTTP_1_1, OK, M3U, responseSize, keyword + ".m3u");
     SendResponseHeader(clientSocket, response);
+    std::array<char, DEFAULT_BUFFER_SIZE> buffer;
     for(const std::string& url : urls) {
-        clientSocket->Send(url.c_str(), url.size());
+        std::copy(std::begin(url), std::end(url), buffer.data());
+        clientSocket.Send(buffer, url.size());
     }
 }
 
 
-void AudioStreamingServer::SendNotFound(const std::shared_ptr<ISocket>& clientSocket) const {
+void AudioStreamingServer::SendNotFound(Socket& clientSocket) const {
 
     static const char* notFoundContent = "<h1>File Not Found</h1>";
     static const unsigned notFoundContentLength = strlen(notFoundContent);
 
+    std::array<char, DEFAULT_BUFFER_SIZE> buffer;
+    std::copy(notFoundContent, notFoundContent + notFoundContentLength, buffer.data());
+
     HttpResponse response(HTTP_1_1, NOT_FOUND, NONE, notFoundContentLength);
     SendResponseHeader(clientSocket, response);
-    clientSocket->Send(notFoundContent, notFoundContentLength);
+    clientSocket.Send(buffer, notFoundContentLength);
 }

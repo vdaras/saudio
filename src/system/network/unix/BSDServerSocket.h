@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011-2014, Vasileios Daras. All rights reserved.
+ * Copyright (c) 2011-2017, Vasileios Daras. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,13 +25,13 @@
 #include <sys/select.h>
 
 #include "BSDSocket.h"
-#include "system/network/IServerSocket.h"
+#include "system/network/Socket.h"
 
 
 /**
  * Class encapsulating functiality for a TCP BSD server socket.
  */
-class BSDServerSocket : public BSDSocket, public IServerSocket {
+class BSDServerSocket : public BSDSocket {
 
     unsigned short portNo;
 
@@ -40,6 +40,8 @@ class BSDServerSocket : public BSDSocket, public IServerSocket {
     fd_set masterDescriptors;
     
     public:
+
+    typedef SocketTemplate<BSDSocket> AcceptedSocketType;
 
     /**
      * Constructor.
@@ -50,9 +52,8 @@ class BSDServerSocket : public BSDSocket, public IServerSocket {
      * @param open
      *        Whether to open the port during construction or not
      *
-     * @throws
-     *        AudioStreamer Exception
-     *        If the port can't be opened
+     * @throws NetworkException 
+     *         If the port can't be opened.
      */
     BSDServerSocket(unsigned short portNo, bool open = false);
 
@@ -74,23 +75,25 @@ class BSDServerSocket : public BSDSocket, public IServerSocket {
     /**
      * Opens the server socket.
      *
-     * @throws
-     *        OpenSocketException If the port can't be opened.
-     *        BindSocketException If the port can't be binded.
+     * @throws NetworkException 
+     *         If the port can't be opened.
      */
-    virtual void Open() override;
+    void Open();
 
     /**
      * Start listening on this port for incoming connections.
+     *
+     * @throws NetworkException 
+     *         If the port can't be bound.
      */
-    virtual void Listen(int maxConnections) override;
+    void Listen(int maxConnections);
 
     /**
      * @return
      *          Whether the server socket is ready to accept
      *          a connection or not.
      */
-    virtual bool IsReady() const override;
+    bool IsReady() const;
 
     /**
      * Accepts an incoming connection.
@@ -98,13 +101,12 @@ class BSDServerSocket : public BSDSocket, public IServerSocket {
      * @return 
      *         Client's socket
      */
-    virtual std::shared_ptr<ISocket> Accept() const override;
+    SocketTemplate<BSDSocket> Accept() const;
 
     /**
      * Returns the port the server socket is listening to.
      */
-    virtual unsigned short GetPort() const override;
-
+    unsigned short GetPort() const;
 
     /**
      * Disable copy construction.
