@@ -8,7 +8,7 @@ with the language's new features.
 saudio compiles successfully in POSIX compliant OSes. The code that handles platform 
 specific code can be extended to support other platforms. 
 
-saudio is minimalistic. It ony uses the STL and the POSIX API. 
+saudio is minimalistic. It only uses the STL and the POSIX API. 
 
 An SCons build script is included with the source code.
 In order build the server using the aforementioned script you need to have the
