@@ -5,16 +5,14 @@ saudio is a simple audio file streaming server developed in C++11.
 It was mainly written for learning purposes as I wanted to get more familiar
 with the language's new features. 
 
-saudio compiles successfully in all platforms but running it is only supported
-in Unix-like OSes. The code that handles platform specific code can be extended
-to support other platforms. 
+saudio compiles successfully in POSIX compliant OSes. The code that handles platform 
+specific code can be extended to support other platforms. 
 
-saudio is minimalistic, it only uses the STL and no external libraries. 
+saudio is minimalistic. It ony uses the STL and the POSIX API. 
 
 An SCons build script is included with the source code.
 In order build the server using the aforementioned script you need to have the
 SCons software installed in your machine.
-
 
 How to build:
 
