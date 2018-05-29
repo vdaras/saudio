@@ -27,7 +27,8 @@
 #include <queue>
 #include <thread>
 #include <vector>
-
+#include <functional>
+#include <condition_variable>
 
 /**
  * Class managing a pool of threads.

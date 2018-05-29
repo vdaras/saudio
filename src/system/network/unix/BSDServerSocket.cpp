@@ -115,12 +115,6 @@ SocketTemplate<BSDSocket> BSDServerSocket::Accept() const {
         throw NetworkException(strerror(errno));
     }
     
-    //don't emit SIGPIPE if the client stops sending data
-    int set = 1;
-    auto ret = setsockopt(descriptor, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
-    if(ret == -1) {
-        throw NetworkException(strerror(errno));
-    }
     return SocketTemplate<BSDSocket>(descriptor);
 }
 

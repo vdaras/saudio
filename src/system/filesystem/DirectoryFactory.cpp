@@ -26,6 +26,8 @@
 #include <errno.h>
 #endif
 
+#include <cstring>
+
 #include "system/SystemException.h"
 
 std::unique_ptr<Directory> DirectoryFactory::CreateDirectoryTree(const std::string& rootDirectory) {
@@ -44,7 +46,7 @@ void DirectoryFactory::PopulateDirectoryUnix(Directory* directory, const std::st
     DIR* current = opendir(directoryPath.c_str());
     if(!current)
     {
-        throw SystemException(strerror(errno));
+        throw SystemException(std::strerror(errno));
     }
 
     dirent* directoryEntry = readdir(current);
