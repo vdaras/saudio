@@ -29,7 +29,7 @@ else:
     profile = 0
 
 #Process command line options
-compiler_flags = ['-std=c++11']
+compiler_flags = ['-std=c++14']
 linker_flags = []
 
 if profile:

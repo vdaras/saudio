@@ -1,7 +1,7 @@
 saudio
 ======
 
-saudio is a simple audio file streaming server developed in C++11. 
+saudio is a simple audio file streaming server developed in C++14. 
 It was mainly written for learning purposes as I wanted to get more familiar
 with the language's new features. 
 
